@@ -30,11 +30,7 @@ app.use(function (req, res, next) {
     }
 });
 
-app.use("/api", GeneralRoutes);
-app.get('/', function (req, res) {
-    res.sendfile('../www/index.html');
-
-});
+app.use("/", GeneralRoutes);
 app.get('*', function (req, res) {
     var index = (path.resolve(__dirname + '/../www/index.html'));
     res.sendFile(index);
@@ -43,4 +39,4 @@ app.get('*', function (req, res) {
 app.listen(3000, function () {
     console.log('Start Server at 3000');
 });
-mongoose.connect('mongodb://@ds039185.mongolab.com:39185/salesman');
+mongoose.connect('mongodb://salesman:salesman@ds039185.mongolab.com:39185/salesman');

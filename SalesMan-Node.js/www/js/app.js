@@ -7,98 +7,100 @@
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services'])
 
-.run(function($ionicPlatform, $rootScope) {
-	$rootScope.$on('$stateChangeStart', function(event, toState){
-		var firebaseToken = localStorage.token;
-		console.log(firebaseToken);
-		if(toState.loginCompulsory ){
-			// console.log(event);
-			console.log(toState);
-			event.preventDefault();
-		}
-	})
+    .run(function ($ionicPlatform, $rootScope, $state) {
+        $rootScope.$on("$stateChangeStart", function (event, toState) {
+            var firebaseLocalToken = localStorage.getItem("token");
+            if (toState.loginCompulsory && !firebaseLocalToken) {
+                event.preventDefault();
+                $state.go("login");
+            }
+        });
 
-	$ionicPlatform.ready(function() {
-		// Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-		// for form inputs)
-		if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
-			cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
-			cordova.plugins.Keyboard.disableScroll(true);
-		}
-		if (window.StatusBar) {
-			// org.apache.cordova.statusbar required
-			StatusBar.styleLightContent();
-		}
-	});
-})
+        $ionicPlatform.ready(function () {
+            if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
+                cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+                cordova.plugins.Keyboard.disableScroll(true);
+            }
+            if (window.StatusBar) {
+                // org.apache.cordova.statusbar required
+                StatusBar.styleLightContent();
+            }
+        });
+    })
 
-.config(function($stateProvider, $urlRouterProvider) {
+    .config(function ($stateProvider, $urlRouterProvider,$httpProvider) {
+        $stateProvider
+            .state('tab.home', {
+                url: '/home',
+                views: {
+                    'tab-home': {
+                        templateUrl: 'templates/tab-home.html',
+                        controller: 'homeCtrl',
+                        loginCompulsory: true
+                    }
+                }
+            })
 
-  // Ionic uses AngularUI Router which uses the concept of states
-  // Learn more here: https://github.com/angular-ui/ui-router
-  // Set up the various states which the app can be in.
-  // Each state's controller can be found in controllers.js
-  $stateProvider
+            .state('tab', {
+                url: '/tab',
+                abstract: true,
+                templateUrl: 'templates/tabs.html'
+            })
 
-  // setup an abstract state for the tabs directive
-  .state('home', {
-	url: '/home',
-	// abstract: true,
-	loginCompulsory : true,
-	templateUrl: 'templates/home.html',
-	controller:'homeCtrl',
-	data: {
-        requireLogin: true // this property will apply to all children of 'app'
-      }
-  })
-  .state('tab', {
-	url: '/tab',
-	abstract: true,
-	templateUrl: 'templates/tabs.html'
-  })
+            // Each tab has its own nav history stack:
 
-  // Each tab has its own nav history stack:
+            .state('tab.signin', {
+                url: '/signin',
+                views: {
+                    'tab-signin': {
+                        templateUrl: 'templates/tab-signin.html',
+                        controller: 'SigninCtrl'
+                    }
+                }
+            })
 
-  .state('tab.signin', {
-	url: '/signin',
-	views: {
-	  'tab-signin': {
-		templateUrl: 'templates/tab-signin.html',
-		controller: 'SigninCtrl'
-	  }
-	}
-  })
+            .state('tab.signup', {
+                url: '/signup',
+                views: {
+                    'tab-signup': {
+                        templateUrl: 'templates/tab-signup.html',
+                        controller: 'SignupCtrl'
+                    }
+                }
+            })
 
-  .state('tab.signup', {
-	url: '/signup',
-	views: {
-	  'tab-signup': {
-		templateUrl: 'templates/tab-signup.html',
-		controller: 'SignupCtrl'
-	  }
-	}
-  })
+            .state('tab.chats', {
+                url: '/chats',
+                views: {
+                    'tab-chats': {
+                        templateUrl: 'templates/tab-chats.html',
+                        controller: 'ChatsCtrl'
+                    }
+                }
+            })
+            .state('tab.chat-detail', {
+                url: '/chats/:chatId',
+                views: {
+                    'tab-chats': {
+                        templateUrl: 'templates/chat-detail.html',
+                        controller: 'ChatDetailCtrl'
+                    }
+                }
+            });
 
-  .state('tab.chats', {
-	  url: '/chats',
-	  views: {
-		'tab-chats': {
-		  templateUrl: 'templates/tab-chats.html',
-		  controller: 'ChatsCtrl'
-		}
-	  }
-	})
-	.state('tab.chat-detail', {
-	  url: '/chats/:chatId',
-	  views: {
-		'tab-chats': {
-		  templateUrl: 'templates/chat-detail.html',
-		  controller: 'ChatDetailCtrl'
-		}
-	  }
-	});
+        // if none of the above states are matched, use this as the fallback
+        $urlRouterProvider.otherwise('/tab/signin');
+        //$httpProvider.interceptors.push('httpInterceptor');
+    })
+    //.factory("httpInterceptor", function () {
+    //    return {
+    //        request: function (config) {
+    //            var token = localStorage.getItem("token");
+    //            if (token) {
+    //                config.url = config.url + "?token=" + token;
+    //            }
+    //            return config;
+    //        }
+    //    }
+    //});
 
-  // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/signin');
-
-});

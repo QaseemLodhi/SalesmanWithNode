@@ -1,24 +1,27 @@
 angular.module('starter.controllers', [])
 
-    .controller('SigninCtrl', function ($scope, $http,$state) {
+    .controller('SigninCtrl', function ($scope, $http,$state,$rootScope) {
+        $rootScope.flag = false;
         $scope.username = '';
         $scope.email = '';
         $scope.password = '';
-        $scope.signin = function () {
+        $scope.signin = function (email, password) {
             var user = {
-                email: $scope.email,
-                passowrd: $scope.password
+                Email: email,
+                password: password
             };
-            $http.post('/api/signin', {data: user})
-                .then(function (res) {
-                    if (response.token) {
-                        localStorage.setItem('token', response.token);
-                        alert("Successful Signin");
-                        console.log('Signin-Data', res);
-                        $state.go("home");
+            $http.post('/signin',user)
+                .success(function(res){
+                    if (res.token) {
+                        localStorage.setItem('token', res.token);
+                        alert('Login Successfull');
+                        console.log('Data: ', res);
+                        $state.go('tab.home');
                     }
-                }, function (err) {
-                    console.log(err);
+                })
+                .error(function(err){
+                    alert('Either username and password do not match');
+                    console.log('Error:',err)
                 })
         }
     })
@@ -29,27 +32,30 @@ angular.module('starter.controllers', [])
                 firstName: firstName,
                 lastName: lastName,
                 Email: email,
-                password: password
+                password: password,
+                FirebaseToken:''
             }
-            $http.post('/api/signup', {data: user})
-                .then(function (resdata) {
-                    alert('Mubarak Ho');
-                    console.log('Data: ', resdata);
+            $http.post('/signup',  user)
+                .success(function(data){
+                    alert('Successfully SignUp');
+                    console.log('Data: ', data);
                     $state.go('tab.signin');
-                }, function (err) {
-                    alert('Nuksan Hogaya');
-                    console.log('Error: ', err)
+                })
+                .error(function(err){
+                    alert('Either username and password do not match');
+                    console.log('Error:',err)
                 })
         }
     })
 
-    .controller('homeCtrl',function($scope,$http,$state){
-        $http.get('/api/salesman')
-            .then(function(res){
-                console.log(res);
-            },function(err){
-                console.log(err);
-            })
+    .controller('homeCtrl',function($scope,$http,$state,$rootScope){
+        //if(user)
+        //$http.get('/api/salesman')
+        //    .then(function(res){
+        //        console.log(res);
+        //    },function(err){
+        //        console.log(err);
+        //    })
     })
 
     .controller('ChatsCtrl', function ($scope, Chats) {
