@@ -1,10 +1,8 @@
 angular.module('starter.controllers', [])
 
     .controller('SigninCtrl', function ($scope, $http,$state,$rootScope) {
-        $rootScope.flag = false;
-        $scope.username = '';
-        $scope.email = '';
-        $scope.password = '';
+        $scope.email= "";
+        $scope.password = "";
         $scope.signin = function (email, password) {
             var user = {
                 Email: email,
@@ -14,7 +12,8 @@ angular.module('starter.controllers', [])
                 .success(function(res){
                     if (res.token) {
                         localStorage.setItem('token', res.token);
-                        alert('Login Successfull');
+                        localStorage.setItem('Login',true);
+                        alert('Login Successful');
                         console.log('Data: ', res);
                         $state.go('tab.home');
                     }
@@ -23,7 +22,7 @@ angular.module('starter.controllers', [])
                     alert('Either username and password do not match');
                     console.log('Error:',err)
                 })
-        }
+        };
     })
     .controller('SignupCtrl', function ($scope, $timeout, $http, $state) {
 
@@ -49,6 +48,12 @@ angular.module('starter.controllers', [])
     })
 
     .controller('homeCtrl',function($scope,$http,$state,$rootScope){
+
+        $scope.logout = function(){
+            localStorage.removeItem('token');
+            localStorage.setItem('Login',false);
+            $state.go('tab.signin');
+        };
         //if(user)
         //$http.get('/api/salesman')
         //    .then(function(res){
